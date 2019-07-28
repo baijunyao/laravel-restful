@@ -7,9 +7,9 @@ trait Store
     public function store()
     {
         $this->formRequestValidation('Store');
-        $resourceFQN = $this->getResourceFQN();
-        $model = $this->getModelFQN();
+        $resourceFQCN = $this->getResourceFQCN();
+        $model = $this->getModelFQCN();
 
-        return new $resourceFQN((new $model)->create(request()->all()));
+        return new $resourceFQCN((new $model)->create(request()->all()));
     }
 }

@@ -6,7 +6,7 @@ trait Destroy
 {
     public function destroy()
     {
-        $model = static::getModelFQN();
+        $model = static::getModelFQCN();
         $id = $this->getRouteId();
         (new $model)->destroy($id);
 

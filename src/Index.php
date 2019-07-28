@@ -6,8 +6,8 @@ trait Index
 {
     public function index()
     {
-        $model = $this->getModelFQN();
-        $resource = $this->getResourceFQN();
+        $model = $this->getModelFQCN();
+        $resource = $this->getResourceFQCN();
 
         return $resource::collection((new $model)->withTrashed()->paginate());
     }

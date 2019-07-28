@@ -6,8 +6,8 @@ trait Restore
 {
     public function restore()
     {
-        $model = $this->getModelFQN();
-        $resource = $this->getResourceFQN();
+        $model = $this->getModelFQCN();
+        $resource = $this->getResourceFQCN();
 
         $currentModel = (new $model)->withTrashed()->find($this->getRouteId());
         $currentModel->restore();

@@ -24,7 +24,7 @@ class RestfulController extends BaseController
         return substr(trim(strrchr(static::class, '\\'),'\\'), 0, -10);
     }
 
-    protected function getModelFQN()
+    protected function getModelFQCN()
     {
         $model = static::MODEL;
 
@@ -35,7 +35,7 @@ class RestfulController extends BaseController
         return $model;
     }
 
-    protected function getResourceFQN()
+    protected function getResourceFQCN()
     {
         $resource  = '\\App\\Http\\Resources\\' . $this->getResourceName();
 
@@ -46,8 +46,8 @@ class RestfulController extends BaseController
     {
         if (file_exists(app_path('Http/Requests/' . $this->getResourceName() . '/' . $className . '.php'))) {
             $app = app();
-            $requestFQN = '\\App\\Http\\Requests\\' . $this->getResourceName() . '\\' . $className;
-            $request = $requestFQN::createFrom($app['request']);
+            $requestFQCN = '\\App\\Http\\Requests\\' . $this->getResourceName() . '\\' . $className;
+            $request = $requestFQCN::createFrom($app['request']);
             $request->setContainer($app)->setRedirector($app->make(Redirector::class));
             $request->validateResolved();
         }
