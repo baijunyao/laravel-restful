@@ -25,6 +25,8 @@ trait Destroy
             throw new LaravelRestfulException('Destroy Failed');
         }
 
-        return response('');
+        $resource = static::getResourceFQCN();
+
+        return new $resource($model::withTrashed()->find($id));
     }
 }
