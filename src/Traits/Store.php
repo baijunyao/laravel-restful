@@ -20,6 +20,6 @@ trait Store
         $model = static::getModelFQCN();
         $resource = static::getResourceFQCN();
 
-        return new $resource($model::create(request()->all()));
+        return new $resource($model::create(request()->all())->refresh());
     }
 }
