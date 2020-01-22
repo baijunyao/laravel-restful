@@ -18,6 +18,6 @@ trait Index
         $model = static::getModelFQCN();
         $resource = static::getResourceFQCN();
 
-        return $resource::collection($model::withTrashed()->paginate());
+        return $resource::collection($model::withTrashed()->paginate(static::PER_PAGE));
     }
 }

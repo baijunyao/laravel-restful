@@ -16,7 +16,8 @@ class RestfulController extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    protected const MODEL = null;
+    protected const MODEL    = null;
+    protected const PER_PAGE = 15;
 
     /**
      * @return int
