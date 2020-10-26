@@ -3,6 +3,7 @@
 namespace Baijunyao\LaravelRestful\Traits;
 
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Spatie\QueryBuilder\QueryBuilder;
 
 trait Index
 {
@@ -15,14 +16,26 @@ trait Index
      */
     public function index()
     {
-        $model = static::getModelFQCN();
-        $resource = static::getResourceFQCN();
-        $list = $model::withTrashed()
-            ->when(static::ORDER_BY_COLUMN !== null, function ($query) {
-                return $query->orderBy(static::ORDER_BY_COLUMN, static::ORDER_BY_DIRECTION);
-            })
-            ->paginate(static::PER_PAGE);
+        $collection = QueryBuilder::for(static::getModelFQCN());
 
-        return $resource::collection($list);
+        if (static::FILTERS !== []) {
+            $collection->allowedFilters(static::FILTERS);
+        }
+
+        if (static::SORTS !== []) {
+            $collection->allowedSorts(static::SORTS);
+        }
+
+        if (static::FIELDS !== []) {
+            $collection->allowedFields(static::FIELDS);
+        }
+
+        if (static::RELATIONS !== []) {
+            $collection->allowedIncludes(static::RELATIONS);
+        }
+
+        $resource = static::getResourceFQCN();
+
+        return $resource::collection($collection->paginate(static::PER_PAGE));
     }
 }

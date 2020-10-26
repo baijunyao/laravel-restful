@@ -16,10 +16,12 @@ class RestfulController extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    protected const MODEL    = null;
-    protected const ORDER_BY_COLUMN = null;
-    protected const ORDER_BY_DIRECTION = 'asc';
+    protected const FILTERS = [];
+    protected const SORTS = [];
+    protected const FIELDS = [];
+    protected const RELATIONS = [];
     protected const PER_PAGE = 15;
+    protected const MODEL = null;
 
     /**
      * @return int
