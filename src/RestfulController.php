@@ -97,4 +97,24 @@ class RestfulController extends BaseController
             $request->validateResolved();
         }
     }
+
+    protected function getFilters()
+    {
+        return static::FILTERS;
+    }
+
+    protected function getSorts()
+    {
+        return static::SORTS;
+    }
+
+    protected function getFields()
+    {
+        return static::FIELDS;
+    }
+
+    protected function getRelations()
+    {
+        return static::RELATIONS;
+    }
 }

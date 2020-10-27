@@ -7,6 +7,11 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 trait Index
 {
+    abstract function getFilters();
+    abstract function getSorts();
+    abstract function getFields();
+    abstract function getRelations();
+
     /**
      * Index
      *
@@ -18,20 +23,25 @@ trait Index
     {
         $collection = QueryBuilder::for(static::getModelFQCN());
 
-        if (static::FILTERS !== []) {
-            $collection->allowedFilters(static::FILTERS);
+        $filters = $this->getFilters();
+        $sorts = $this->getSorts();
+        $fields = $this->getFields();
+        $relations = $this->getRelations();
+
+        if ($filters !== []) {
+            $collection->allowedFilters($filters);
         }
 
-        if (static::SORTS !== []) {
-            $collection->allowedSorts(static::SORTS);
+        if ($sorts !== []) {
+            $collection->allowedSorts($sorts);
         }
 
-        if (static::FIELDS !== []) {
-            $collection->allowedFields(static::FIELDS);
+        if ($fields !== []) {
+            $collection->allowedFields($fields);
         }
 
-        if (static::RELATIONS !== []) {
-            $collection->allowedIncludes(static::RELATIONS);
+        if ($relations !== []) {
+            $collection->allowedIncludes($relations);
         }
 
         $resource = static::getResourceFQCN();
