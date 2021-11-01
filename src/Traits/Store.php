@@ -17,9 +17,9 @@ trait Store
     {
         $this->formRequestValidation('Store');
 
-        $model = static::getModelFQCN();
+        $modelFQCN = static::getModelFQCN();
         $resource = static::getResourceFQCN();
 
-        return new $resource($model::create(request()->all())->refresh());
+        return new $resource($modelFQCN::create($this->getFilteredPayload())->refresh());
     }
 }

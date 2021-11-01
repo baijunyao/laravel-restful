@@ -17,12 +17,12 @@ trait Update
     {
         $this->formRequestValidation('Update');
 
-        $model = static::getModelFQCN();
+        $modelFQCN = static::getModelFQCN();
         $resource = static::getResourceFQCN();
 
-        $currentModel = $model::find($this->getRouteId());
-        $currentModel->update(request()->all());
+        $model = $modelFQCN::find($this->getRouteId());
+        $model->update($this->getFilteredPayload());
 
-        return new $resource($currentModel);
+        return new $resource($model);
     }
 }

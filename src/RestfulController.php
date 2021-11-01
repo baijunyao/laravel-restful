@@ -2,7 +2,7 @@
 
 namespace Baijunyao\LaravelRestful;
 
-use Baijunyao\LaravelRestful\Support\Model;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -16,11 +16,34 @@ class RestfulController extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    /**
+     * @link https://spatie.be/docs/laravel-query-builder/v3/features/filtering
+     */
     protected const FILTERS = [];
+
+    /**
+     * @link https://spatie.be/docs/laravel-query-builder/v3/features/sorting
+     */
     protected const SORTS = [];
+
+    /**
+     * @link https://spatie.be/docs/laravel-query-builder/v3/features/selecting-fields
+     */
     protected const FIELDS = [];
+
+    /**
+     * @link https://spatie.be/docs/laravel-query-builder/v3/features/selecting-fields#selecting-fields-for-included-relations
+     */
     protected const RELATIONS = [];
+
+    /**
+     * @see \Illuminate\Database\Eloquent\Builder::paginate($perPage, ...)
+     */
     protected const PER_PAGE = 15;
+
+    /**
+     * Laravel model name
+     */
     protected const MODEL = null;
 
     /**
@@ -96,6 +119,17 @@ class RestfulController extends BaseController
             $request->setContainer($app)->setRedirector($app->make(Redirector::class));
             $request->validateResolved();
         }
+    }
+
+    protected function getFilteredPayload()
+    {
+        $model = new ($this->getModelFQCN());
+
+        assert($model instanceof Model);
+
+        $fillable = $model->getFillable();
+
+        return $fillable === [] ? request()->all() : request()->only($fillable);
     }
 
     protected function getFilters()
