@@ -4,18 +4,12 @@ namespace Baijunyao\LaravelRestful;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Routing\Redirector;
 
 class RestfulController extends BaseController
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-
     /**
      * @link https://spatie.be/docs/laravel-query-builder/v3/features/filtering
      */
@@ -110,7 +104,6 @@ class RestfulController extends BaseController
     protected function formRequestValidation(string $className)
     {
         if (file_exists(app_path('Http/Requests/' . $this->getResourceName() . '/' . $className . '.php'))) {
-            /* @var $requestFQCN FormRequest */
             $requestFQCN = '\\App\\Http\\Requests\\' . $this->getResourceName() . '\\' . $className;
 
             $app = app();
