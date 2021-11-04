@@ -6,14 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 trait Update
 {
-    /**
-     * Update
-     *
-     * @return JsonResource
-     *
-     * @author hanmeimei
-     */
-    public function update()
+    public function update(): JsonResource
     {
         $this->formRequestValidation('Update');
 

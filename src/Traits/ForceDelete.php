@@ -3,20 +3,11 @@
 namespace Baijunyao\LaravelRestful\Traits;
 
 use Baijunyao\LaravelRestful\Exceptions\LaravelRestfulException;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Response;
 
 trait ForceDelete
 {
-    /**
-     * Force Delete
-     *
-     * @return ResponseFactory|Response
-     * @throws LaravelRestfulException
-     *
-     * @author hanmeimei
-     */
-    public function forceDelete()
+    public function forceDelete(): Response
     {
         $id = $this->getRouteId();
         $model = static::getModelFQCN();

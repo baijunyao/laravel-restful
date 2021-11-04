@@ -6,14 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 trait Restore
 {
-    /**
-     * Restore
-     *
-     * @return JsonResource
-     *
-     * @author hanmeimei
-     */
-    public function restore()
+    public function restore(): JsonResource
     {
         $model = static::getModelFQCN();
         $resource = static::getResourceFQCN();

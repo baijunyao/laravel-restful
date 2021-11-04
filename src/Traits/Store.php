@@ -6,14 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 trait Store
 {
-    /**
-     * Store
-     *
-     * @return JsonResource
-     *
-     * @author hanmeimei
-     */
-    public function store()
+    public function store(): JsonResource
     {
         $this->formRequestValidation('Store');
 
