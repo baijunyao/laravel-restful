@@ -6,23 +6,16 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 trait Update
 {
-    /**
-     * Update
-     *
-     * @return JsonResource
-     *
-     * @author hanmeimei
-     */
-    public function update()
+    public function update(): JsonResource
     {
         $this->formRequestValidation('Update');
 
-        $model = static::getModelFQCN();
+        $modelFQCN = static::getModelFQCN();
         $resource = static::getResourceFQCN();
 
-        $currentModel = $model::find($this->getRouteId());
-        $currentModel->update(request()->all());
+        $model = $modelFQCN::find($this->getRouteId());
+        $model->update($this->getFilteredPayload());
 
-        return new $resource($currentModel);
+        return new $resource($model);
     }
 }

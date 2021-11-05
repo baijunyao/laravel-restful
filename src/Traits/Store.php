@@ -6,20 +6,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 trait Store
 {
-    /**
-     * Store
-     *
-     * @return JsonResource
-     *
-     * @author hanmeimei
-     */
-    public function store()
+    public function store(): JsonResource
     {
         $this->formRequestValidation('Store');
 
-        $model = static::getModelFQCN();
+        $modelFQCN = static::getModelFQCN();
         $resource = static::getResourceFQCN();
 
-        return new $resource($model::create(request()->all())->refresh());
+        return new $resource($modelFQCN::create($this->getFilteredPayload())->refresh());
     }
 }

@@ -2,92 +2,72 @@
 
 namespace Baijunyao\LaravelRestful;
 
-use Baijunyao\LaravelRestful\Support\Model;
-use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Routing\Redirector;
 
 class RestfulController extends BaseController
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-
+    /**
+     * @link https://spatie.be/docs/laravel-query-builder/v3/features/filtering
+     */
     protected const FILTERS = [];
+
+    /**
+     * @link https://spatie.be/docs/laravel-query-builder/v3/features/sorting
+     */
     protected const SORTS = [];
+
+    /**
+     * @link https://spatie.be/docs/laravel-query-builder/v3/features/selecting-fields
+     */
     protected const FIELDS = [];
+
+    /**
+     * @link https://spatie.be/docs/laravel-query-builder/v3/features/selecting-fields#selecting-fields-for-included-relations
+     */
     protected const RELATIONS = [];
+
+    /**
+     * @see \Illuminate\Database\Eloquent\Builder::paginate($perPage, ...)
+     */
     protected const PER_PAGE = 15;
+
+    /**
+     * Laravel model name
+     */
     protected const MODEL = null;
 
-    /**
-     * @return int
-     *
-     * @author hanmeimei
-     */
-    protected function getRouteId()
+    protected function getRouteId(): int
     {
-        return current(request()->route()->parameters);
+        return (int) current(request()->route()->parameters);
     }
 
-    /**
-     * Get Resource Name
-     *
-     * @return bool|string
-     *
-     * @author hanmeimei
-     */
-    protected function getResourceName()
+    protected function getResourceName(): string
     {
         return substr(trim(strrchr(static::class, '\\'), '\\'), 0, -10);
     }
 
     /**
-     * Get Model
-     *
-     * @return Model
-     *
-     * @author hanmeimei
+     * @return class-string<Model>
      */
-    protected function getModelFQCN()
+    protected function getModelFQCN(): string
     {
-        /* @var $model Model */
-        $model = static::MODEL ?? '\\App\\Models\\' . $this->getResourceName();
-
-        return $model;
+        return static::MODEL ?? '\\App\\Models\\' . $this->getResourceName();
     }
 
     /**
-     * Get Resource
-     *
-     * @return JsonResource
-     *
-     * @author hanmeimei
+     * @return class-string<JsonResource>
      */
-    protected function getResourceFQCN()
+    protected function getResourceFQCN(): string
     {
-        /* @var $resource JsonResource */
-        $resource = '\\App\\Http\\Resources\\' . $this->getResourceName();
-
-        return $resource;
+        return '\\App\\Http\\Resources\\' . $this->getResourceName();
     }
 
-    /**
-     * Validation Request Form
-     *
-     * @param string $className
-     *
-     * @throws BindingResolutionException
-     *
-     * @author hanmeimei
-     */
-    protected function formRequestValidation(string $className)
+    protected function formRequestValidation(string $className): void
     {
         if (file_exists(app_path('Http/Requests/' . $this->getResourceName() . '/' . $className . '.php'))) {
-            /* @var $requestFQCN FormRequest */
             $requestFQCN = '\\App\\Http\\Requests\\' . $this->getResourceName() . '\\' . $className;
 
             $app = app();
@@ -98,22 +78,33 @@ class RestfulController extends BaseController
         }
     }
 
-    protected function getFilters()
+    protected function getFilteredPayload(): array
+    {
+        $model = new ($this->getModelFQCN());
+
+        assert($model instanceof Model);
+
+        $fillable = $model->getFillable();
+
+        return $fillable === [] ? request()->all() : request()->only($fillable);
+    }
+
+    protected function getFilters(): array
     {
         return static::FILTERS;
     }
 
-    protected function getSorts()
+    protected function getSorts(): array
     {
         return static::SORTS;
     }
 
-    protected function getFields()
+    protected function getFields(): array
     {
         return static::FIELDS;
     }
 
-    protected function getRelations()
+    protected function getRelations(): array
     {
         return static::RELATIONS;
     }

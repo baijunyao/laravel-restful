@@ -6,14 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 trait Show
 {
-    /**
-     * Show
-     *
-     * @return JsonResource
-     *
-     * @author hanmeimei
-     */
-    public function show()
+    public function show(): JsonResource
     {
         $model = static::getModelFQCN();
         $resource = static::getResourceFQCN();

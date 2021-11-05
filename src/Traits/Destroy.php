@@ -3,20 +3,11 @@
 namespace Baijunyao\LaravelRestful\Traits;
 
 use Baijunyao\LaravelRestful\Exceptions\LaravelRestfulException;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Http\Response;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 trait Destroy
 {
-    /**
-     * Destroy
-     *
-     * @return ResponseFactory|Response
-     * @throws LaravelRestfulException
-     *
-     * @author hanmeimei
-     */
-    public function destroy()
+    public function destroy(): JsonResource
     {
         $id = $this->getRouteId();
         $model = static::getModelFQCN();

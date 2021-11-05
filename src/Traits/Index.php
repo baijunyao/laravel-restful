@@ -12,14 +12,7 @@ trait Index
     abstract function getFields();
     abstract function getRelations();
 
-    /**
-     * Index
-     *
-     * @return AnonymousResourceCollection
-     *
-     * @author hanmeimei
-     */
-    public function index()
+    public function index(): AnonymousResourceCollection
     {
         $collection = QueryBuilder::for(static::getModelFQCN());
 
