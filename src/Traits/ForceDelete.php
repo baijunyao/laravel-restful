@@ -16,6 +16,6 @@ trait ForceDelete
             throw new LaravelRestfulException('Force Delete Failed');
         }
 
-        return response('');
+        return response()->noContent();
     }
 }
