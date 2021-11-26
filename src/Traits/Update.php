@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Baijunyao\LaravelRestful\Traits;
 
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -11,7 +13,7 @@ trait Update
         $this->formRequestValidation('Update');
 
         $modelFQCN = static::getModelFQCN();
-        $resource = static::getResourceFQCN();
+        $resource  = static::getResourceFQCN();
 
         $model = $modelFQCN::find($this->getRouteId());
         $model->update($this->getFilteredPayload());

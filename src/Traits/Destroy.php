@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Baijunyao\LaravelRestful\Traits;
 
 use Baijunyao\LaravelRestful\Exceptions\LaravelRestfulException;
@@ -9,7 +11,7 @@ trait Destroy
 {
     public function destroy(): JsonResource
     {
-        $id = $this->getRouteId();
+        $id    = $this->getRouteId();
         $model = static::getModelFQCN();
 
         if ($model::destroy($id) === 0) {

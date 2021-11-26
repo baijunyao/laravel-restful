@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Baijunyao\LaravelRestful\Traits;
 
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -7,18 +9,21 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 trait Index
 {
-    abstract function getFilters();
-    abstract function getSorts();
-    abstract function getFields();
-    abstract function getRelations();
+    abstract public function getFilters();
+
+    abstract public function getSorts();
+
+    abstract public function getFields();
+
+    abstract public function getRelations();
 
     public function index(): AnonymousResourceCollection
     {
         $collection = QueryBuilder::for(static::getModelFQCN());
 
-        $filters = $this->getFilters();
-        $sorts = $this->getSorts();
-        $fields = $this->getFields();
+        $filters   = $this->getFilters();
+        $sorts     = $this->getSorts();
+        $fields    = $this->getFields();
         $relations = $this->getRelations();
 
         if ($filters !== []) {
