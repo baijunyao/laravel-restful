@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Baijunyao\LaravelRestful;
 
 use Illuminate\Database\Eloquent\Model;
@@ -70,7 +72,7 @@ class RestfulController extends BaseController
         if (file_exists(app_path('Http/Requests/' . $this->getResourceName() . '/' . $className . '.php'))) {
             $requestFQCN = '\\App\\Http\\Requests\\' . $this->getResourceName() . '\\' . $className;
 
-            $app = app();
+            $app     = app();
             $request = $requestFQCN::createFrom($app['request']);
 
             $request->setContainer($app)->setRedirector($app->make(Redirector::class));
@@ -80,7 +82,8 @@ class RestfulController extends BaseController
 
     protected function getFilteredPayload(): array
     {
-        $model = new ($this->getModelFQCN());
+        $modelFQCN = $this->getModelFQCN();
+        $model     = new $modelFQCN();
 
         assert($model instanceof Model);
 
