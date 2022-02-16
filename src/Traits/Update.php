@@ -15,7 +15,7 @@ trait Update
         $modelFQCN = static::getModelFQCN();
         $resource  = static::getResourceFQCN();
 
-        $model = $modelFQCN::find($this->getRouteId());
+        $model = $modelFQCN::withTrashed()->find($this->getRouteId());
         $model->update($this->getFilteredPayload());
 
         return new $resource($model);
