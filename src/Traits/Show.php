@@ -18,10 +18,7 @@ trait Show
     use GetModelFqcn;
     use GetResourceFqcn;
     use WithTrashed;
-
-    abstract public function getFields();
-
-    abstract public function getRelations();
+    use QueryBuilderWrapper;
 
     public function show(): JsonResource
     {
@@ -40,6 +37,8 @@ trait Show
 
         assert($query instanceof \Illuminate\Database\Eloquent\Builder);
 
-        return new $resource($query->findOrFail($this->getRouteId()));
+        $spatie_query_builder = $this->makeQueryBuilder($query);
+
+        return new $resource($spatie_query_builder->findOrFail($this->getRouteId()));
     }
 }
