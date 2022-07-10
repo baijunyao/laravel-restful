@@ -19,17 +19,33 @@
         "illuminate/routing": "^7.0|^8.0|^9.0"
     },
     "require-dev": {
-        "baijunyao/php-cs-fixer-config": "^0.1"
+        "baijunyao/php-cs-fixer-config": "^0.1",
+        "orchestra/testbench": "^7.6"
     },
     "autoload": {
         "psr-4": {
             "Baijunyao\\LaravelRestful\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Baijunyao\\LaravelRestful\\Tests\\": "tests/Feature",
+            "App\\": "tests/app"
+        }
+    },
     "scripts": {
         "phpcs": "vendor/bin/php-cs-fixer fix",
         "lint": [
             "composer phpcs"
+        ],
+        "test": "./vendor/bin/phpunit",
+        "test:coverage-html": [
+            "@putenv XDEBUG_MODE=coverage",
+            "./vendor/bin/phpunit --coverage-html coverage"
+        ],
+        "test:coverage-xml": [
+            "@putenv XDEBUG_MODE=coverage",
+            "./vendor/bin/phpunit --coverage-clover coverage/coverage.xml"
         ]
     }
 }
