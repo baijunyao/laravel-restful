@@ -4,46 +4,18 @@ declare(strict_types=1);
 
 namespace Baijunyao\LaravelRestful\Traits;
 
+use Baijunyao\LaravelRestful\Traits\Functions\GetResourceFqcn;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Spatie\QueryBuilder\QueryBuilder;
 
 trait Index
 {
-    abstract public function getFilters();
+    use GetResourceFqcn;
+    use QueryBuilderWrapper;
 
-    abstract public function getSorts();
-
-    abstract public function getFields();
-
-    abstract public function getRelations();
+    abstract public function getPerPage();
 
     public function index(): AnonymousResourceCollection
     {
-        $collection = QueryBuilder::for(static::getModelFQCN());
-
-        $filters   = $this->getFilters();
-        $sorts     = $this->getSorts();
-        $fields    = $this->getFields();
-        $relations = $this->getRelations();
-
-        if ($filters !== []) {
-            $collection->allowedFilters($filters);
-        }
-
-        if ($sorts !== []) {
-            $collection->allowedSorts($sorts);
-        }
-
-        if ($fields !== []) {
-            $collection->allowedFields($fields);
-        }
-
-        if ($relations !== []) {
-            $collection->allowedIncludes($relations);
-        }
-
-        $resource = static::getResourceFQCN();
-
-        return $resource::collection($collection->paginate(static::PER_PAGE));
+        return $this->getResourceFqcn()::collection($this->makeQueryBuilder()->paginate($this->getPerPage()));
     }
 }

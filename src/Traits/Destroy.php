@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Baijunyao\LaravelRestful\Traits;
 
-use Baijunyao\LaravelRestful\Exceptions\LaravelRestfulException;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Baijunyao\LaravelRestful\Traits\Functions\GetModelFqcn;
+use Baijunyao\LaravelRestful\Traits\Functions\GetRouteId;
+use Illuminate\Http\Response;
 
 trait Destroy
 {
-    public function destroy(): JsonResource
+    use GetRouteId;
+    use GetModelFqcn;
+
+    public function destroy(): Response
     {
         $id    = $this->getRouteId();
-        $model = static::getModelFQCN();
+        $model = $this->getModelFqcn();
 
-        if ($model::destroy($id) === 0) {
-            throw new LaravelRestfulException('Destroy Failed');
-        }
+        $model::findOrFail($id)->delete();
 
-        $resource = static::getResourceFQCN();
-
-        return new $resource($model::withTrashed()->find($id));
+        return response()->noContent();
     }
 }

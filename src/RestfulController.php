@@ -5,29 +5,28 @@ declare(strict_types=1);
 namespace Baijunyao\LaravelRestful;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Routing\Redirector;
 
 class RestfulController extends BaseController
 {
     /**
-     * @link https://spatie.be/docs/laravel-query-builder/v3/features/filtering
+     * @link https://spatie.be/docs/laravel-query-builder/v5/features/filtering
      */
     protected const FILTERS = [];
 
     /**
-     * @link https://spatie.be/docs/laravel-query-builder/v3/features/sorting
+     * @link https://spatie.be/docs/laravel-query-builder/v5/features/sorting
      */
     protected const SORTS = [];
 
     /**
-     * @link https://spatie.be/docs/laravel-query-builder/v3/features/selecting-fields
+     * @link https://spatie.be/docs/laravel-query-builder/v5/features/selecting-fields
      */
     protected const FIELDS = [];
 
     /**
-     * @link https://spatie.be/docs/laravel-query-builder/v3/features/selecting-fields#selecting-fields-for-included-relations
+     * @link https://spatie.be/docs/laravel-query-builder/v5/features/selecting-fields#selecting-fields-for-included-relations
      */
     protected const RELATIONS = [];
 
@@ -41,6 +40,14 @@ class RestfulController extends BaseController
      */
     protected const MODEL = null;
 
+    /**
+     * @see \Baijunyao\LaravelRestful\Traits\Functions\WithTrashed::withTrashed()
+     */
+    protected const WITH_TRASHED = false;
+
+    /**
+     * @see \Baijunyao\LaravelRestful\Traits\Functions\GetRouteId::getRouteId()
+     */
     protected function getRouteId(): int
     {
         return (int) current(request()->route()->parameters);
@@ -52,28 +59,30 @@ class RestfulController extends BaseController
     }
 
     /**
-     * @return class-string<Model>
+     * @see \Baijunyao\LaravelRestful\Traits\Functions\GetModelFqcn::getModelFqcn()
      */
-    protected function getModelFQCN(): string
+    protected function getModelFqcn(): string
     {
         return static::MODEL ?? '\\App\\Models\\' . $this->getResourceName();
     }
 
     /**
-     * @return class-string<JsonResource>
+     * @see \Baijunyao\LaravelRestful\Traits\Functions\GetResourceFqcn::getResourceFqcn()
      */
-    protected function getResourceFQCN(): string
+    protected function getResourceFqcn(): string
     {
-        return '\\App\\Http\\Resources\\' . $this->getResourceName();
+        return '\\App\\Http\\Resources\\' . $this->getResourceName() . 'Resource';
     }
 
     protected function formRequestValidation(string $className): void
     {
-        if (file_exists(app_path('Http/Requests/' . $this->getResourceName() . '/' . $className . '.php'))) {
-            $requestFQCN = '\\App\\Http\\Requests\\' . $this->getResourceName() . '\\' . $className;
+        $requestClass = '\\App\\Http\\Requests\\' . $this->getResourceName() . '\\' . $className;
 
+        if (class_exists($requestClass)) {
             $app     = app();
-            $request = $requestFQCN::createFrom($app['request']);
+            $request = $requestClass::createFrom($app['request']);
+
+            assert($request instanceof \Illuminate\Foundation\Http\FormRequest);
 
             $request->setContainer($app)->setRedirector($app->make(Redirector::class));
             $request->validateResolved();
@@ -82,8 +91,7 @@ class RestfulController extends BaseController
 
     protected function getFilteredPayload(): array
     {
-        $modelFQCN = $this->getModelFQCN();
-        $model     = new $modelFQCN();
+        $model = new ($this->getModelFqcn());
 
         assert($model instanceof Model);
 
@@ -110,5 +118,15 @@ class RestfulController extends BaseController
     protected function getRelations(): array
     {
         return static::RELATIONS;
+    }
+
+    protected function withTrashed(): bool
+    {
+        return static::WITH_TRASHED;
+    }
+
+    protected function getPerPage(): int
+    {
+        return static::PER_PAGE;
     }
 }
