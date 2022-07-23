@@ -1,0 +1,87 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  markdown_lint:
+    name: Markdown Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Run markdownlint
+        uses: docker://avtodev/markdown-lint:v1
+        with:
+          args: './README.md'
+
+  phpcs:
+    name: PHPCS
+    runs-on: ubuntu-latest
+    container:
+      image: baijunyao/php:8.1-local
+      volumes:
+        - /__w/laravel-restful/laravel-restful:/app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - uses: actions/cache@v1
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+      - name: Initial
+        run: |
+          composer install
+      - name: PHP CS Fixer
+        run: |
+          ./vendor/bin/php-cs-fixer fix --verbose --show-progress=dots --dry-run --diff
+
+  phpunit:
+    name: PHPUnit
+    runs-on: ubuntu-latest
+    container:
+      image: baijunyao/php:8.1-local
+      volumes:
+        - /__w/laravel-restful/laravel-restful:/app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - uses: actions/cache@v1
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+      - name: Initial
+        run: |
+          composer install
+      - name: Test
+        run: |
+          composer test:coverage-xml
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          files: coverage/coverage.xml
+
+  notify:
+    name: Slack Notify
+    runs-on: ubuntu-latest
+    needs: [markdown_lint, phpcs, phpunit]
+    if: always()
+    steps:
+      - name: Slack Notify
+        uses: baijunyao/action-slack-notify@v3.0.0
+        if: ${{ github.event_name == 'push' }}
+        with:
+          slack_channel_id: CLGSTC1PV
+          slack_bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
+          github_context: ${{ toJson(github) }}
