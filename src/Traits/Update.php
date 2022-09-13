@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Baijunyao\LaravelRestful\Traits;
 
 use Baijunyao\LaravelRestful\Exceptions\LaravelRestfulException;
+use Baijunyao\LaravelRestful\JsonResource;
 use Baijunyao\LaravelRestful\Traits\Functions\GetModelFqcn;
 use Baijunyao\LaravelRestful\Traits\Functions\GetResourceFqcn;
 use Baijunyao\LaravelRestful\Traits\Functions\GetRouteId;
 use Baijunyao\LaravelRestful\Traits\Functions\WithTrashed;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Http\Resources\Json\JsonResource;
 
 trait Update
 {
@@ -23,24 +23,24 @@ trait Update
     {
         $this->formRequestValidation('Update');
 
-        $model = $this->getModelFqcn();
+        $modelFqcn = $this->getModelFqcn();
 
-        if ($this->withTrashed()) {
-            if (in_array(SoftDeletes::class, class_uses_recursive($model), true) === false) {
-                throw new LaravelRestfulException('You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the ' . $model . ' model.');
+        if (static::withTrashed()) {
+            if (in_array(SoftDeletes::class, class_uses_recursive($modelFqcn), true) === false) {
+                throw new LaravelRestfulException('You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the ' . $modelFqcn . ' model.');
             }
 
-            $query = $model::withTrashed();
+            $query = $modelFqcn::withTrashed();
         } else {
-            $query = $model::query();
+            $query = $modelFqcn::query();
         }
 
         assert($query instanceof \Illuminate\Database\Eloquent\Builder);
 
-        $resource  = $this->getResourceFqcn();
-        $model     = $query->findOrFail($this->getRouteId());
-        $model->update($this->getFilteredPayload());
+        $resourceFqcn  = $this->getResourceFqcn();
+        $modelFqcn     = $query->findOrFail($this->getRouteId());
+        $modelFqcn->update($this->getFilteredPayload());
 
-        return new $resource($model);
+        return new $resourceFqcn($modelFqcn, __CLASS__);
     }
 }

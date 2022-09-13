@@ -14,6 +14,16 @@ use Illuminate\Support\Facades\Event;
 
 class TagControllerTest extends TestCase
 {
+    public function testIndex(): void
+    {
+        $tags = $this->get('/tags')
+            ->assertStatus(200)
+            ->json('data');
+
+        static::assertCount(2, $tags);
+        static::assertEquals(self::TAG_NAME, $tags[0]['name']);
+    }
+
     public function testShowDeletedTag(): void
     {
         Tag::destroy(self::TAG_ID);
@@ -56,7 +66,7 @@ class TagControllerTest extends TestCase
 
     protected function defineRoutes($router)
     {
-        $router->resource('tags', TagController::class)->only('show', 'update');
+        $router->resource('tags', TagController::class)->only('index', 'show', 'update');
         $router->patch('tags/{tag}/restore', TagController::class . '@restore')->name('tags.restore');
         $router->delete('tags/{tag}/forceDelete', TagController::class . '@forceDelete')->name('tags.forceDelete');
     }

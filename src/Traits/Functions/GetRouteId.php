@@ -6,5 +6,5 @@ namespace Baijunyao\LaravelRestful\Traits\Functions;
 
 trait GetRouteId
 {
-    abstract public function getRouteId(): int;
+    abstract public function getRouteId(): int|string;
 }

@@ -19,16 +19,16 @@ trait Restore
 
     public function restore(): JsonResource
     {
-        $model    = $this->getModelFqcn();
-        $resource = $this->getResourceFqcn();
+        $modelFqcn    = $this->getModelFqcn();
+        $resourceFqcn = $this->getResourceFqcn();
 
-        if (in_array(SoftDeletes::class, class_uses_recursive($model), true) === false) {
-            throw new LaravelRestfulException('You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the ' . $model . ' model.');
+        if (in_array(SoftDeletes::class, class_uses_recursive($modelFqcn), true) === false) {
+            throw new LaravelRestfulException('You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the ' . $modelFqcn . ' model.');
         }
 
-        $currentModel = $model::withTrashed()->findOrFail($this->getRouteId());
+        $currentModel = $modelFqcn::withTrashed()->findOrFail($this->getRouteId());
         $currentModel->restore();
 
-        return new $resource($currentModel);
+        return new $resourceFqcn($currentModel, __CLASS__);
     }
 }

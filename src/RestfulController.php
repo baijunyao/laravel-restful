@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Baijunyao\LaravelRestful;
 
+use Illuminate\Contracts\Pagination\CursorPaginator;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Routing\Redirector;
+use Spatie\QueryBuilder\QueryBuilder as SpatieQueryBuilder;
 
 class RestfulController extends BaseController
 {
@@ -45,12 +49,47 @@ class RestfulController extends BaseController
      */
     protected const WITH_TRASHED = false;
 
+    public static function getFilters(): array
+    {
+        return static::FILTERS;
+    }
+
+    public static function getSorts(): array
+    {
+        return static::SORTS;
+    }
+
+    public static function getFields(): array
+    {
+        return static::FIELDS;
+    }
+
+    public static function getRelations(): array
+    {
+        return static::RELATIONS;
+    }
+
+    public static function withTrashed(): bool
+    {
+        return static::WITH_TRASHED;
+    }
+
+    public static function getPerPage(): int
+    {
+        return static::PER_PAGE;
+    }
+
+    public function customPaginate(SpatieQueryBuilder $builder): Paginator|CursorPaginator
+    {
+        return $builder->paginate(static::getPerPage());
+    }
+
     /**
      * @see \Baijunyao\LaravelRestful\Traits\Functions\GetRouteId::getRouteId()
      */
-    protected function getRouteId(): int
+    protected function getRouteId(): int|string
     {
-        return (int) current(request()->route()->parameters);
+        return current(request()->route()->parameters);
     }
 
     protected function getResourceName(): string
@@ -74,6 +113,25 @@ class RestfulController extends BaseController
         return '\\App\\Http\\Resources\\' . $this->getResourceName() . 'Resource';
     }
 
+    /**
+     * @see \Baijunyao\LaravelRestful\Traits\Functions\GetResourceFqcn::getResourceFqcn()
+     */
+    protected function getResourceCollectionFqcn(): string
+    {
+        return '\\App\\Http\\Resources\\' . $this->getResourceName() . 'Collection';
+    }
+
+    protected function getFilteredPayload(): array
+    {
+        $model = new ($this->getModelFqcn());
+
+        assert($model instanceof Model);
+
+        $fillable = $model->getFillable();
+
+        return $fillable === [] ? request()->all() : request()->only($fillable);
+    }
+
     protected function formRequestValidation(string $className): void
     {
         $requestClass = '\\App\\Http\\Requests\\' . $this->getResourceName() . '\\' . $className;
@@ -89,44 +147,31 @@ class RestfulController extends BaseController
         }
     }
 
-    protected function getFilteredPayload(): array
+    protected function makeQueryBuilder(EloquentBuilder $builder = null): SpatieQueryBuilder
     {
-        $model = new ($this->getModelFqcn());
+        $spatie_query_builder = SpatieQueryBuilder::for($builder ?? $this->getModelFqcn());
 
-        assert($model instanceof Model);
+        $filters   = static::getFilters();
+        $sorts     = static::getSorts();
+        $fields    = static::getFields();
+        $relations = static::getRelations();
 
-        $fillable = $model->getFillable();
+        if ($filters !== []) {
+            $spatie_query_builder->allowedFilters($filters);
+        }
 
-        return $fillable === [] ? request()->all() : request()->only($fillable);
-    }
+        if ($sorts !== []) {
+            $spatie_query_builder->allowedSorts($sorts);
+        }
 
-    protected function getFilters(): array
-    {
-        return static::FILTERS;
-    }
+        if ($fields !== []) {
+            $spatie_query_builder->allowedFields($fields);
+        }
 
-    protected function getSorts(): array
-    {
-        return static::SORTS;
-    }
+        if ($relations !== []) {
+            $spatie_query_builder->allowedIncludes($relations);
+        }
 
-    protected function getFields(): array
-    {
-        return static::FIELDS;
-    }
-
-    protected function getRelations(): array
-    {
-        return static::RELATIONS;
-    }
-
-    protected function withTrashed(): bool
-    {
-        return static::WITH_TRASHED;
-    }
-
-    protected function getPerPage(): int
-    {
-        return static::PER_PAGE;
+        return $spatie_query_builder;
     }
 }

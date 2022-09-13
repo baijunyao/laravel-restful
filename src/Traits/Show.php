@@ -8,6 +8,7 @@ use Baijunyao\LaravelRestful\Exceptions\LaravelRestfulException;
 use Baijunyao\LaravelRestful\Traits\Functions\GetModelFqcn;
 use Baijunyao\LaravelRestful\Traits\Functions\GetResourceFqcn;
 use Baijunyao\LaravelRestful\Traits\Functions\GetRouteId;
+use Baijunyao\LaravelRestful\Traits\Functions\MakeQueryBuilder;
 use Baijunyao\LaravelRestful\Traits\Functions\WithTrashed;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -18,27 +19,27 @@ trait Show
     use GetModelFqcn;
     use GetResourceFqcn;
     use WithTrashed;
-    use QueryBuilderWrapper;
+    use MakeQueryBuilder;
 
     public function show(): JsonResource
     {
-        $model    = $this->getModelFqcn();
-        $resource = $this->getResourceFqcn();
+        $modelFqcn    = $this->getModelFqcn();
+        $resourceFqcn = $this->getResourceFqcn();
 
-        if ($this->withTrashed()) {
-            if (in_array(SoftDeletes::class, class_uses_recursive($model), true) === false) {
-                throw new LaravelRestfulException('You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the ' . $model . ' model.');
+        if (static::withTrashed()) {
+            if (in_array(SoftDeletes::class, class_uses_recursive($modelFqcn), true) === false) {
+                throw new LaravelRestfulException('You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the ' . $modelFqcn . ' model.');
             }
 
-            $query = $model::withTrashed();
+            $query = $modelFqcn::withTrashed();
         } else {
-            $query = $model::query();
+            $query = $modelFqcn::query();
         }
 
         assert($query instanceof \Illuminate\Database\Eloquent\Builder);
 
         $spatie_query_builder = $this->makeQueryBuilder($query);
 
-        return new $resource($spatie_query_builder->findOrFail($this->getRouteId()));
+        return new $resourceFqcn($spatie_query_builder->findOrFail($this->getRouteId()), __CLASS__);
     }
 }
