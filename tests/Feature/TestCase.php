@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Baijunyao\LaravelRestful\Tests;
 
-use Illuminate\Database\Schema\Blueprint;
+use App\Providers\RouteServiceProvider;
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Spatie\QueryBuilder\QueryBuilderServiceProvider;
 
@@ -16,62 +15,26 @@ class TestCase extends BaseTestCase
     use RefreshDatabase;
 
     protected const ID_NOT_FOUND  = 999999;
-    protected const TAG_ID        = 1;
-    protected const TAG_NAME      = 'laravel restful tag';
-    protected const CATEGORY_ID   = 1;
-    protected const CATEGORY_NAME = 'laravel restful category';
+    protected const TAG_ID        = DatabaseSeeder::TAG_ID;
+    protected const TAG_NAME      = DatabaseSeeder::TAG_NAME;
+    protected const CATEGORY_ID   = DatabaseSeeder::CATEGORY_ID;
+    protected const CATEGORY_NAME = DatabaseSeeder::CATEGORY_NAME;
 
     protected function getPackageProviders($app)
     {
         return [
+            RouteServiceProvider::class,
             QueryBuilderServiceProvider::class,
         ];
     }
 
-    protected function defineDatabaseMigrations()
+    protected function getBasePath()
     {
-        Schema::create('tags', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('name');
-            $table->timestamps();
-            $table->softDeletes();
-        });
-
-        Schema::create('categories', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('tag_id')->nullable();
-            $table->string('name');
-            $table->string('description');
-            $table->timestamps();
-        });
+        return __DIR__ . '/../skeleton';
     }
 
-    protected function defineDatabaseSeeders()
+    protected function defineDatabaseMigrations()
     {
-        DB::table('tags')->insert([
-            [
-                'id'   => self::TAG_ID,
-                'name' => self::TAG_NAME,
-            ],
-            [
-                'id'   => 2,
-                'name' => 'test',
-            ],
-        ]);
-
-        DB::table('categories')->insert([
-            [
-                'id'          => self::CATEGORY_ID,
-                'tag_id'      => 1,
-                'name'        => self::CATEGORY_NAME,
-                'description' => 'laravel restful category description',
-            ],
-            [
-                'id'          => 2,
-                'tag_id'      => 2,
-                'name'        => 'test',
-                'description' => 'test',
-            ],
-        ]);
+        $this->artisan('migrate --seed')->run();
     }
 }

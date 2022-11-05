@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Baijunyao\LaravelRestful\Tests\Home;
 
-use App\Http\Controllers\Home\CategoryController;
 use App\Observers\CategoryCreated;
 use App\Observers\CategoryDeleted;
 use App\Observers\CategoryUpdated;
@@ -15,7 +14,7 @@ class CategoryControllerTest extends TestCase
 {
     public function testIndex(): void
     {
-        $categories = $this->get('/categories')
+        $categories = $this->get('/home/categories')
             ->assertStatus(200)
             ->json('data');
 
@@ -31,7 +30,7 @@ class CategoryControllerTest extends TestCase
             'include'            => 'tag',
         ];
 
-        $categories = $this->get('/categories?' . http_build_query($query))
+        $categories = $this->get('/home/categories?' . http_build_query($query))
             ->assertStatus(200)
             ->json('data');
 
@@ -47,7 +46,7 @@ class CategoryControllerTest extends TestCase
 
     public function testIndexSort(): void
     {
-        $categories = $this->get('/categories?sort=-id')
+        $categories = $this->get('/home/categories?sort=-id')
             ->assertStatus(200)
             ->json('data');
 
@@ -57,7 +56,7 @@ class CategoryControllerTest extends TestCase
 
     public function testShow(): void
     {
-        $category = $this->get('/categories/' . self::CATEGORY_ID . '?include=tag')
+        $category = $this->get('/home/categories/' . self::CATEGORY_ID . '?include=tag')
             ->assertStatus(200)
             ->json('data');
 
@@ -72,7 +71,7 @@ class CategoryControllerTest extends TestCase
 
         $name     = 'new category';
         $category = $this->post(
-            '/categories',
+            '/home/categories',
             [
                 'name'        => $name,
                 'tag_id'      => null,
@@ -89,7 +88,7 @@ class CategoryControllerTest extends TestCase
     public function testStoreError(): void
     {
         $response = $this->post(
-            '/categories',
+            '/home/categories',
             [
                 'description' => 'new category description',
             ],
@@ -109,7 +108,7 @@ class CategoryControllerTest extends TestCase
         Event::fake();
 
         $name     = self::CATEGORY_NAME . ' updated';
-        $category = $this->put('/categories/' . self::CATEGORY_ID, ['name' => $name])
+        $category = $this->put('/home/categories/' . self::CATEGORY_ID, ['name' => $name])
             ->assertStatus(200)
             ->json('data');
 
@@ -121,19 +120,19 @@ class CategoryControllerTest extends TestCase
     {
         Event::fake();
 
-        $this->delete('/categories/' . self::CATEGORY_ID)->assertStatus(204);
+        $this->delete('/home/categories/' . self::CATEGORY_ID)->assertStatus(204);
 
         Event::assertDispatched(CategoryDeleted::class);
     }
 
     public function testDestroyWhenIdNotFound(): void
     {
-        $this->delete('/categories/' . self::ID_NOT_FOUND)->assertStatus(404);
+        $this->delete('/home/categories/' . self::ID_NOT_FOUND)->assertStatus(404);
     }
 
     public function testForceDeleteError(): void
     {
-        $response = $this->delete('/categories/' . self::CATEGORY_ID . '/forceDelete')->assertStatus(500);
+        $response = $this->delete('/home/categories/' . self::CATEGORY_ID . '/forceDelete')->assertStatus(500);
         static::assertEquals(
             'You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the App\Models\Category model.',
             $response->exception->getMessage()
@@ -142,17 +141,10 @@ class CategoryControllerTest extends TestCase
 
     public function testRestoreError(): void
     {
-        $response = $this->patch('/categories/' . self::CATEGORY_ID . '/restore')->assertStatus(500);
+        $response = $this->patch('/home/categories/' . self::CATEGORY_ID . '/restore')->assertStatus(500);
         static::assertEquals(
             'You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the App\Models\Category model.',
             $response->exception->getMessage()
         );
-    }
-
-    protected function defineRoutes($router)
-    {
-        $router->resource('categories', CategoryController::class);
-        $router->patch('categories/{category}/restore', CategoryController::class . '@restore')->name('categories.restore');
-        $router->delete('categories/{category}/forceDelete', CategoryController::class . '@forceDelete')->name('categories.forceDelete');
     }
 }

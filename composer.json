@@ -30,7 +30,8 @@
     "autoload-dev": {
         "psr-4": {
             "Baijunyao\\LaravelRestful\\Tests\\": "tests/Feature",
-            "App\\": "tests/app"
+            "App\\": "tests/skeleton/app",
+            "Database\\Seeders\\": "tests/skeleton/database/seeders/"
         }
     },
     "scripts": {
@@ -48,5 +49,12 @@
             "composer phpcs",
             "composer test"
         ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Baijunyao\\LaravelRestful\\LaravelRestfulServiceProvider"
+            ]
+        }
     }
 }
