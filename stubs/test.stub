@@ -1,0 +1,16 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature\Resources;
+
+class {{class}} extends TestCase
+{
+    public int $showId       = 1;
+    public int $updateId     = 1;
+    public int $destroyId    = 1;
+
+    public array $storeData = [];
+
+    public array $updateData = [];
+}
