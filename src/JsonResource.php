@@ -42,9 +42,6 @@ class JsonResource extends \Illuminate\Http\Resources\Json\JsonResource
         return $this->controllerFqcn;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function toArray($request)
     {
         /** @var class-string<\Baijunyao\LaravelRestful\RestfulController> $controllerFqcn */
