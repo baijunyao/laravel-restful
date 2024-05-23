@@ -18,7 +18,7 @@ jobs:
     name: PHPCS
     runs-on: ubuntu-latest
     container:
-      image: baijunyao/php:8.1-local
+      image: baijunyao/php:8.3-cli-local
       volumes:
         - /__w/laravel-restful/laravel-restful:/app
     steps:
@@ -45,7 +45,7 @@ jobs:
     name: PHPUnit
     runs-on: ubuntu-latest
     container:
-      image: baijunyao/php:8.1-local
+      image: baijunyao/php:8.3-cli-local
       volumes:
         - /__w/laravel-restful/laravel-restful:/app
     steps:

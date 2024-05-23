@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Baijunyao\LaravelRestful\Tests\Home;
 
-use App\Observers\CategoryCreated;
-use App\Observers\CategoryDeleted;
-use App\Observers\CategoryUpdated;
 use Baijunyao\LaravelRestful\Tests\TestCase;
 use Illuminate\Support\Facades\Event;
+use Workbench\App\Observers\CategoryCreated;
+use Workbench\App\Observers\CategoryDeleted;
+use Workbench\App\Observers\CategoryUpdated;
 
 class CategoryControllerTest extends TestCase
 {
@@ -134,7 +134,7 @@ class CategoryControllerTest extends TestCase
     {
         $response = $this->delete('/home/categories/' . self::CATEGORY_ID . '/forceDelete')->assertStatus(500);
         static::assertEquals(
-            'You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the App\Models\Category model.',
+            'You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the Workbench\App\Models\Category model.',
             $response->exception->getMessage()
         );
     }
@@ -143,7 +143,7 @@ class CategoryControllerTest extends TestCase
     {
         $response = $this->patch('/home/categories/' . self::CATEGORY_ID . '/restore')->assertStatus(500);
         static::assertEquals(
-            'You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the App\Models\Category model.',
+            'You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the Workbench\App\Models\Category model.',
             $response->exception->getMessage()
         );
     }

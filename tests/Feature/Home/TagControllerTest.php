@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Baijunyao\LaravelRestful\Tests\Home;
 
-use App\Models\Tag;
-use App\Observers\TagDeleted;
-use App\Observers\TagRestored;
 use Baijunyao\LaravelRestful\Tests\TestCase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Workbench\App\Models\Tag;
+use Workbench\App\Observers\TagDeleted;
+use Workbench\App\Observers\TagRestored;
 
 class TagControllerTest extends TestCase
 {

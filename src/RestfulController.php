@@ -10,9 +10,10 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Str;
 use Spatie\QueryBuilder\QueryBuilder as SpatieQueryBuilder;
 
-class RestfulController extends BaseController
+abstract class RestfulController extends BaseController
 {
     /**
      * @link https://spatie.be/docs/laravel-query-builder/v5/features/filtering
@@ -94,7 +95,12 @@ class RestfulController extends BaseController
 
     protected function getResourceName(): string
     {
-        return substr(trim(strrchr(static::class, '\\'), '\\'), 0, -10);
+        return Str::before(class_basename(static::class), 'Controller');
+    }
+
+    protected function getAppNamespace(): string
+    {
+        return Str::before(static::class, 'Http\\');
     }
 
     /**
@@ -102,7 +108,7 @@ class RestfulController extends BaseController
      */
     protected function getModelFqcn(): string
     {
-        return static::MODEL ?? '\\App\\Models\\' . $this->getResourceName();
+        return static::MODEL ?? $this->getAppNamespace() . 'Models\\' . $this->getResourceName();
     }
 
     /**
@@ -110,7 +116,7 @@ class RestfulController extends BaseController
      */
     protected function getResourceFqcn(): string
     {
-        return '\\App\\Http\\Resources\\' . $this->getResourceName() . 'Resource';
+        return $this->getAppNamespace() . 'Http\\Resources\\' . $this->getResourceName() . 'Resource';
     }
 
     /**
@@ -118,7 +124,7 @@ class RestfulController extends BaseController
      */
     protected function getResourceCollectionFqcn(): string
     {
-        return '\\App\\Http\\Resources\\' . $this->getResourceName() . 'Collection';
+        return $this->getAppNamespace() . 'Http\\Resources\\' . $this->getResourceName() . 'Collection';
     }
 
     protected function getFilteredPayload(): array
@@ -134,7 +140,7 @@ class RestfulController extends BaseController
 
     protected function formRequestValidation(string $className): void
     {
-        $requestClass = '\\App\\Http\\Requests\\' . $this->getResourceName() . '\\' . $className;
+        $requestClass = $this->getAppNamespace() . 'Http\\Requests\\' . $this->getResourceName() . '\\' . $className;
 
         if (class_exists($requestClass)) {
             $app     = app();
@@ -147,7 +153,7 @@ class RestfulController extends BaseController
         }
     }
 
-    protected function makeQueryBuilder(EloquentBuilder $builder = null): SpatieQueryBuilder
+    protected function makeQueryBuilder(?EloquentBuilder $builder = null): SpatieQueryBuilder
     {
         $spatie_query_builder = SpatieQueryBuilder::for($builder ?? $this->getModelFqcn());
 

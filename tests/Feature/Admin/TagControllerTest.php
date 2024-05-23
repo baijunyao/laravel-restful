@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Baijunyao\LaravelRestful\Tests\Admin;
 
-use App\Models\Tag;
 use Baijunyao\LaravelRestful\Tests\TestCase;
+use Workbench\App\Models\Tag;
 
 class TagControllerTest extends TestCase
 {

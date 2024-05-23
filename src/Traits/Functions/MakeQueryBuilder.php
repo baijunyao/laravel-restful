@@ -12,5 +12,5 @@ trait MakeQueryBuilder
     /**
      * @see \Baijunyao\LaravelRestful\RestfulController::makeQueryBuilder()
      */
-    abstract public function makeQueryBuilder(EloquentBuilder $builder = null): SpatieQueryBuilder;
+    abstract public function makeQueryBuilder(?EloquentBuilder $builder = null): SpatieQueryBuilder;
 }

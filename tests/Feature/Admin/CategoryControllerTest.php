@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Baijunyao\LaravelRestful\Tests\Admin;
 
-use App\Models\Category;
 use Baijunyao\LaravelRestful\Tests\TestCase;
+use Workbench\App\Models\Category;
 
 class CategoryControllerTest extends TestCase
 {
@@ -16,7 +16,7 @@ class CategoryControllerTest extends TestCase
         $response = $this->get('/admin/categories/' . self::CATEGORY_ID);
 
         static::assertEquals(
-            'You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the App\Models\Category model.',
+            'You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the Workbench\App\Models\Category model.',
             $response->exception->getMessage()
         );
     }
@@ -28,7 +28,7 @@ class CategoryControllerTest extends TestCase
         $response = $this->put('/admin/categories/' . self::CATEGORY_ID, ['name' => self::CATEGORY_NAME . ' updated'])->assertStatus(500);
 
         static::assertEquals(
-            'You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the App\Models\Category model.',
+            'You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the Workbench\App\Models\Category model.',
             $response->exception->getMessage()
         );
     }

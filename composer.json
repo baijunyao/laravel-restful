@@ -1,6 +1,9 @@
 {
     "name": "baijunyao/laravel-restful",
-    "keywords": ["laravel", "restful"],
+    "keywords": [
+        "laravel",
+        "restful"
+    ],
     "description": "Laravel Restful",
     "type": "library",
     "license": "MIT",
@@ -20,7 +23,7 @@
     },
     "require-dev": {
         "baijunyao/php-cs-fixer-config": "^0.1",
-        "orchestra/testbench": "^7.6"
+        "orchestra/testbench": "^9.1"
     },
     "autoload": {
         "psr-4": {
@@ -30,9 +33,9 @@
     "autoload-dev": {
         "psr-4": {
             "Baijunyao\\LaravelRestful\\Tests\\": "tests/Feature",
-            "App\\": "tests/skeleton/app",
-            "Database\\Seeders\\": "tests/skeleton/database/seeders/",
-            "Tests\\": "tests/skeleton/tests/"
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
         }
     },
     "scripts": {
@@ -49,6 +52,18 @@
         "lint": [
             "composer phpcs",
             "composer test"
+        ],
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve"
         ]
     },
     "extra": {
