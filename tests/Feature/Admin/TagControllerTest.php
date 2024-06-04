@@ -9,6 +9,15 @@ use Workbench\App\Models\Tag;
 
 class TagControllerTest extends TestCase
 {
+    public function testIndex(): void
+    {
+        $tags = $this->get('/admin/tags?include=categoriesCount')
+            ->assertStatus(200)
+            ->json('data');
+
+        static::assertEquals([1, 1], array_column($tags, 'categories_count'));
+    }
+
     public function testShowDeletedTag(): void
     {
         Tag::destroy(self::TAG_ID);

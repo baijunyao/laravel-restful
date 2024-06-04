@@ -46,7 +46,7 @@ class JsonResource extends \Illuminate\Http\Resources\Json\JsonResource
     {
         /** @var class-string<\Baijunyao\LaravelRestful\RestfulController> $controllerFqcn */
         $controllerFqcn = $this->getControllerFqcn();
-        $fields         = $controllerFqcn::getFields();
+        $fields         = (new $controllerFqcn())->getAllowedFields();
 
         if ($fields === []) {
             return parent::toArray($request);

@@ -21,5 +21,5 @@ class TagController extends RestfulController
     use Destroy;
     use ForceDelete;
     use Restore;
-    protected const MODEL = Tag::class;
+    protected ?string $model = Tag::class;
 }

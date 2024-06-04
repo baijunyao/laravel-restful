@@ -26,7 +26,7 @@ trait Show
         $modelFqcn    = $this->getModelFqcn();
         $resourceFqcn = $this->getResourceFqcn();
 
-        if (static::withTrashed()) {
+        if ($this->withTrashed()) {
             if (in_array(SoftDeletes::class, class_uses_recursive($modelFqcn), true) === false) {
                 throw new LaravelRestfulException('You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the ' . $modelFqcn . ' model.');
             }
@@ -38,8 +38,11 @@ trait Show
 
         assert($query instanceof \Illuminate\Database\Eloquent\Builder);
 
-        $spatie_query_builder = $this->makeQueryBuilder($query);
-
-        return new $resourceFqcn($spatie_query_builder->findOrFail($this->getRouteId()), __CLASS__);
+        return new $resourceFqcn(
+            $this->makeQueryBuilder($query)->findOrFail(
+                $this->getRouteId()
+            ),
+            __CLASS__
+        );
     }
 }

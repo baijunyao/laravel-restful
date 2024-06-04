@@ -13,4 +13,4 @@ Route::patch('home/tags/{tag}/restore', [Workbench\App\Http\Controllers\Home\Tag
 Route::delete('home/tags/{tag}/forceDelete', [Workbench\App\Http\Controllers\Home\TagController::class, 'forceDelete'])->name('tags.forceDelete');
 
 Route::resource('admin/categories', Workbench\App\Http\Controllers\Admin\CategoryController::class)->only('show', 'update');
-Route::resource('admin/tags', Workbench\App\Http\Controllers\Admin\TagController::class)->only('show', 'update');
+Route::resource('admin/tags', Workbench\App\Http\Controllers\Admin\TagController::class)->only('index', 'show', 'update');

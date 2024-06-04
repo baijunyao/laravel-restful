@@ -7,7 +7,7 @@ namespace Baijunyao\LaravelRestful\Traits\Functions;
 trait GetFields
 {
     /**
-     * @see \Baijunyao\LaravelRestful\RestfulController::FIELDS
+     * @see \Baijunyao\LaravelRestful\RestfulController::$allowedFields
      */
     abstract public static function getFields(): array;
 }

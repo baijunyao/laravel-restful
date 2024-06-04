@@ -7,7 +7,7 @@ namespace Baijunyao\LaravelRestful\Traits\Functions;
 trait GetSorts
 {
     /**
-     * @see \Baijunyao\LaravelRestful\RestfulController::SORTS
+     * @see \Baijunyao\LaravelRestful\RestfulController::$allowedSorts
      */
     abstract public static function getSorts();
 }

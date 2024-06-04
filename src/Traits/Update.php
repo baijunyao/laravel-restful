@@ -25,7 +25,7 @@ trait Update
 
         $modelFqcn = $this->getModelFqcn();
 
-        if (static::withTrashed()) {
+        if ($this->withTrashed()) {
             if (in_array(SoftDeletes::class, class_uses_recursive($modelFqcn), true) === false) {
                 throw new LaravelRestfulException('You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the ' . $modelFqcn . ' model.');
             }

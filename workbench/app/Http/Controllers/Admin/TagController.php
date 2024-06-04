@@ -22,5 +22,9 @@ class TagController extends RestfulController
     use Destroy;
     use ForceDelete;
     use Restore;
-    protected const WITH_TRASHED = true;
+    protected bool $withTrashed = true;
+
+    protected array $allowedIncludes = [
+        'categories',
+    ];
 }

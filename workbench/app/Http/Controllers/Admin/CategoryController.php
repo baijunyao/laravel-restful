@@ -13,6 +13,6 @@ class CategoryController extends RestfulController
 {
     use Show;
     use Update;
-    protected const MODEL        = Category::class;
-    protected const WITH_TRASHED = true;
+    protected ?string $model    = Category::class;
+    protected bool $withTrashed = true;
 }

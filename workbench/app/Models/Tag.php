@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Workbench\App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Workbench\App\Observers\TagCreated;
 use Workbench\App\Observers\TagDeleted;
@@ -25,4 +26,9 @@ class Tag extends Model
         'deleted'  => TagDeleted::class,
         'restored' => TagRestored::class,
     ];
+
+    public function categories(): HasMany
+    {
+        return $this->HasMany(Category::class);
+    }
 }

@@ -23,23 +23,23 @@ class CategoryController extends RestfulController
     use Destroy;
     use ForceDelete;
     use Restore;
-    protected const MODEL = Category::class;
+    protected ?string $model = Category::class;
 
-    protected const FILTERS = [
+    protected array $allowedFilters = [
         'name',
     ];
 
-    protected const FIELDS = [
+    protected array $allowedFields = [
         'id',
         'tag_id',
         'name',
     ];
 
-    protected const SORTS = [
+    protected array $allowedSorts = [
         'id',
     ];
 
-    protected const RELATIONS = [
+    protected array $allowedIncludes = [
         'tag',
     ];
 }

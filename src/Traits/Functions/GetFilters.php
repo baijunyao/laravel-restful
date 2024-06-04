@@ -7,7 +7,7 @@ namespace Baijunyao\LaravelRestful\Traits\Functions;
 trait GetFilters
 {
     /**
-     * @see \Baijunyao\LaravelRestful\RestfulController::FILTERS
+     * @see \Baijunyao\LaravelRestful\RestfulController::$allowedFilters
      */
     abstract public static function getFilters(): array;
 }

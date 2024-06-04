@@ -8,81 +8,85 @@ use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Spatie\QueryBuilder\QueryBuilder as SpatieQueryBuilder;
 
 abstract class RestfulController extends BaseController
 {
+    protected ?Request $request = null;
+
     /**
      * @link https://spatie.be/docs/laravel-query-builder/v5/features/filtering
      */
-    protected const FILTERS = [];
+    protected array $allowedFilters = [];
 
     /**
      * @link https://spatie.be/docs/laravel-query-builder/v5/features/sorting
      */
-    protected const SORTS = [];
+    protected array $allowedSorts = [];
 
     /**
      * @link https://spatie.be/docs/laravel-query-builder/v5/features/selecting-fields
      */
-    protected const FIELDS = [];
+    protected array $allowedFields = [];
 
     /**
-     * @link https://spatie.be/docs/laravel-query-builder/v5/features/selecting-fields#selecting-fields-for-included-relations
+     * @link https://spatie.be/docs/laravel-query-builder/v5/features/including-relationships
      */
-    protected const RELATIONS = [];
+    protected array $allowedIncludes = [];
 
     /**
      * @see \Illuminate\Database\Eloquent\Builder::paginate($perPage, ...)
      */
-    protected const PER_PAGE = 15;
+    protected int $perPage = 15;
 
     /**
      * Laravel model name
      */
-    protected const MODEL = null;
+    protected ?string $model = null;
 
     /**
      * @see \Baijunyao\LaravelRestful\Traits\Functions\WithTrashed::withTrashed()
      */
-    protected const WITH_TRASHED = false;
+    protected bool $withTrashed = false;
 
-    public static function getFilters(): array
+    public function getAllowedFilters(): array
     {
-        return static::FILTERS;
+        return $this->allowedFilters;
     }
 
-    public static function getSorts(): array
+    public function getAllowedSorts(): array
     {
-        return static::SORTS;
+        return $this->allowedSorts;
     }
 
-    public static function getFields(): array
+    public function getAllowedFields(): array
     {
-        return static::FIELDS;
+        return $this->allowedFields;
     }
 
-    public static function getRelations(): array
+    public function getAllowedIncludes(): array
     {
-        return static::RELATIONS;
+        return $this->allowedIncludes;
     }
 
-    public static function withTrashed(): bool
+    public function withTrashed(): bool
     {
-        return static::WITH_TRASHED;
+        return $this->withTrashed;
     }
 
-    public static function getPerPage(): int
+    public function getPerPage(): int
     {
-        return static::PER_PAGE;
+        return $this->perPage;
     }
 
     public function customPaginate(SpatieQueryBuilder $builder): Paginator|CursorPaginator
     {
-        return $builder->paginate(static::getPerPage());
+        return $builder->paginate($this->getPerPage());
     }
 
     /**
@@ -90,7 +94,7 @@ abstract class RestfulController extends BaseController
      */
     protected function getRouteId(): int|string
     {
-        return current(request()->route()->parameters);
+        return current($this->getRequest()->route()->parameters);
     }
 
     protected function getResourceName(): string
@@ -108,7 +112,7 @@ abstract class RestfulController extends BaseController
      */
     protected function getModelFqcn(): string
     {
-        return static::MODEL ?? $this->getAppNamespace() . 'Models\\' . $this->getResourceName();
+        return $this->model ?? $this->getAppNamespace() . 'Models\\' . $this->getResourceName();
     }
 
     /**
@@ -135,7 +139,7 @@ abstract class RestfulController extends BaseController
 
         $fillable = $model->getFillable();
 
-        return $fillable === [] ? request()->all() : request()->only($fillable);
+        return $fillable === [] ? $this->getRequest()->all() : $this->getRequest()->only($fillable);
     }
 
     protected function formRequestValidation(string $className): void
@@ -143,41 +147,50 @@ abstract class RestfulController extends BaseController
         $requestClass = $this->getAppNamespace() . 'Http\\Requests\\' . $this->getResourceName() . '\\' . $className;
 
         if (class_exists($requestClass)) {
-            $app     = app();
-            $request = $requestClass::createFrom($app['request']);
+            $app     = App::getInstance();
+            $request = $requestClass::createFrom($this->getRequest());
 
             assert($request instanceof \Illuminate\Foundation\Http\FormRequest);
 
-            $request->setContainer($app)->setRedirector($app->make(Redirector::class));
+            $request->setContainer(App::getInstance())->setRedirector($app->make(Redirector::class));
             $request->validateResolved();
         }
     }
 
     protected function makeQueryBuilder(?EloquentBuilder $builder = null): SpatieQueryBuilder
     {
-        $spatie_query_builder = SpatieQueryBuilder::for($builder ?? $this->getModelFqcn());
+        $spatieQueryBuilder = SpatieQueryBuilder::for($builder ?? $this->getModelFqcn());
 
-        $filters   = static::getFilters();
-        $sorts     = static::getSorts();
-        $fields    = static::getFields();
-        $relations = static::getRelations();
+        $allowedFilters  = $this->getAllowedFilters();
+        $allowedSorts    = $this->getAllowedSorts();
+        $allowedFields   = $this->getAllowedFields();
+        $allowedIncludes = $this->getAllowedIncludes();
 
-        if ($filters !== []) {
-            $spatie_query_builder->allowedFilters($filters);
+        if ($allowedFilters !== []) {
+            $spatieQueryBuilder->allowedFilters($allowedFilters);
         }
 
-        if ($sorts !== []) {
-            $spatie_query_builder->allowedSorts($sorts);
+        if ($allowedSorts !== []) {
+            $spatieQueryBuilder->allowedSorts($allowedSorts);
         }
 
-        if ($fields !== []) {
-            $spatie_query_builder->allowedFields($fields);
+        if ($allowedFields !== []) {
+            $spatieQueryBuilder->allowedFields($allowedFields);
         }
 
-        if ($relations !== []) {
-            $spatie_query_builder->allowedIncludes($relations);
+        if ($allowedIncludes !== []) {
+            $spatieQueryBuilder->allowedIncludes($allowedIncludes);
         }
 
-        return $spatie_query_builder;
+        return $spatieQueryBuilder;
+    }
+
+    protected function getRequest(): Request
+    {
+        if ($this->request === null) {
+            $this->request = App::make(Request::class);
+        }
+
+        return $this->request;
     }
 }

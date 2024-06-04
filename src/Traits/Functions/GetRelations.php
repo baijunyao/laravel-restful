@@ -7,7 +7,7 @@ namespace Baijunyao\LaravelRestful\Traits\Functions;
 trait GetRelations
 {
     /**
-     * @see \Baijunyao\LaravelRestful\RestfulController::RELATIONS
+     * @see \Baijunyao\LaravelRestful\RestfulController::$allowedIncludes
      */
     abstract public static function getRelations(): array;
 }

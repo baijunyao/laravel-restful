@@ -9,5 +9,5 @@ trait WithTrashed
     /**
      * @see \Illuminate\Database\Eloquent\SoftDeletes::withTrashed()
      */
-    abstract public static function withTrashed(): bool;
+    abstract public function withTrashed(): bool;
 }

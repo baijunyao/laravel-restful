@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
         DB::table('categories')->insert([
             [
                 'id'          => self::CATEGORY_ID,
-                'tag_id'      => 1,
+                'tag_id'      => self::TAG_ID,
                 'name'        => self::CATEGORY_NAME,
                 'description' => 'laravel restful category description',
             ],
