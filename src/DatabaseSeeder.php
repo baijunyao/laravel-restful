@@ -6,6 +6,7 @@ namespace Baijunyao\LaravelRestful;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
+use ReflectionClass;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,7 +16,7 @@ class DatabaseSeeder extends Seeder
 
     public function __construct()
     {
-        $reflection = new \ReflectionClass(static::class);
+        $reflection = new ReflectionClass(static::class);
 
         $this->seederDir               = dirname($reflection->getFileName());
         $this->seederNamespace         = $reflection->getNamespaceName();
