@@ -23,26 +23,18 @@ trait Show
 
     public function show(): JsonResource
     {
-        $modelFqcn    = $this->getModelFqcn();
-        $resourceFqcn = $this->getResourceFqcn();
+        $modelFqcn          = $this->getModelFqcn();
+        $resourceFqcn       = $this->getResourceFqcn();
+        $spatieQueryBuilder = $this->makeQueryBuilder(__FUNCTION__);
 
         if ($this->withTrashed()) {
             if (in_array(SoftDeletes::class, class_uses_recursive($modelFqcn), true) === false) {
                 throw new LaravelRestfulException('You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the ' . $modelFqcn . ' model.');
             }
 
-            $query = $modelFqcn::withTrashed();
-        } else {
-            $query = $modelFqcn::query();
+            $spatieQueryBuilder = $spatieQueryBuilder->withTrashed();
         }
 
-        assert($query instanceof \Illuminate\Database\Eloquent\Builder);
-
-        return new $resourceFqcn(
-            $this->makeQueryBuilder($query)->findOrFail(
-                $this->getRouteId()
-            ),
-            __CLASS__
-        );
+        return new $resourceFqcn($spatieQueryBuilder->findOrFail($this->getRouteId()), __CLASS__);
     }
 }

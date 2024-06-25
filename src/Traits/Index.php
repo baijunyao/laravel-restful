@@ -20,7 +20,7 @@ trait Index
 
     public function index(): JsonResource
     {
-        return new ($this->getResourceCollectionFqcn())($this->customPaginate($this->makeQueryBuilder()), __CLASS__);
+        return new ($this->getResourceCollectionFqcn())($this->customPaginate($this->makeQueryBuilder(__FUNCTION__)), __CLASS__);
     }
 
     abstract protected function customPaginate(SpatieQueryBuilder $builder): Paginator|CursorPaginator;

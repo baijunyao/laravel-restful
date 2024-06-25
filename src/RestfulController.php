@@ -6,7 +6,6 @@ namespace Baijunyao\LaravelRestful;
 
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -157,9 +156,19 @@ abstract class RestfulController extends BaseController
         }
     }
 
-    protected function makeQueryBuilder(?EloquentBuilder $builder = null): SpatieQueryBuilder
+    protected function addQueryForIndex(SpatieQueryBuilder $spatieQueryBuilder): SpatieQueryBuilder
     {
-        $spatieQueryBuilder = SpatieQueryBuilder::for($builder ?? $this->getModelFqcn());
+        return $spatieQueryBuilder;
+    }
+
+    protected function addQueryForShow(SpatieQueryBuilder $spatieQueryBuilder): SpatieQueryBuilder
+    {
+        return $spatieQueryBuilder;
+    }
+
+    protected function makeQueryBuilder(string $action): SpatieQueryBuilder
+    {
+        $spatieQueryBuilder = SpatieQueryBuilder::for($this->getModelFqcn());
 
         $allowedFilters  = $this->getAllowedFilters();
         $allowedSorts    = $this->getAllowedSorts();
@@ -180,6 +189,18 @@ abstract class RestfulController extends BaseController
 
         if ($allowedIncludes !== []) {
             $spatieQueryBuilder->allowedIncludes($allowedIncludes);
+        }
+
+        if ($action === 'index') {
+            $spatieQueryBuilder = $this->addQueryForIndex($spatieQueryBuilder);
+        } elseif ($action === 'show') {
+            $spatieQueryBuilder = $this->addQueryForShow($spatieQueryBuilder);
+        } else {
+            $function = 'addQueryFor' . ucfirst($action);
+
+            if (method_exists($this, $function)) {
+                $spatieQueryBuilder = $this->$function($spatieQueryBuilder);
+            }
         }
 
         return $spatieQueryBuilder;
