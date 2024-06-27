@@ -6,115 +6,131 @@ namespace Baijunyao\LaravelRestful\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class MakeCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'restful:make {name}';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    protected $signature   = 'make:restful {name}';
     protected $description = 'Make restful files';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): int
     {
-        $name            = $this->argument('name');
-        $app_path        = $this->laravel->path();
-        $controller_path = $app_path . '/Http/Controllers/Resources';
-        $stub_path       = __DIR__ . '/../../stubs';
+        // e.g. 'User' or 'Admin/User'
+        $nameWithPrefix = $this->argument('name');
 
-        // controller
-        if (File::isDirectory($controller_path) === false) {
-            File::makeDirectory($controller_path, 0755, true);
+        $prefix         = '';
+        $absolutePrefix = '';
+
+        if (Str::contains($nameWithPrefix, '/')) {
+            // e.g. Admin or ''
+            $prefix  = Str::beforeLast($nameWithPrefix, '/');
+
+            // e.g. /Admin or ''
+            $absolutePrefix = '/' . $prefix;
         }
 
-        $base_controller_file = $controller_path . '/Controller.php';
+        $appPath = $this->laravel->path();
 
-        if (File::exists($base_controller_file) === false) {
-            File::put($base_controller_file, File::get($stub_path . '/controller.base.stub'));
+        if (Str::contains($nameWithPrefix, '/')) {
+            $name = Str::afterLast($nameWithPrefix, '/');
+
+            // e.g. /app/Http/Controllers/Admin/Resources
+            $controllerPath = $appPath . '/Http/Controllers/' . $prefix . '/Resources';
+        } else {
+            $name           = $nameWithPrefix;
+            $controllerPath = $appPath . '/Http/Controllers/Resources';
         }
 
-        $controller_name = $name . 'Controller';
-        $controller_file = $controller_path . '/' . $controller_name . '.php';
+        $stubPath = __DIR__ . '/../../stubs';
 
-        if (File::exists($controller_file) === false) {
-            File::put(
-                $controller_file,
-                str_replace('{{class}}', $controller_name, File::get($stub_path . '/controller.stub'))
-            );
+        /**
+         * Controller
+         */
+        if (File::isDirectory($controllerPath) === false) {
+            File::makeDirectory($controllerPath, 0755, true);
         }
 
-        // resource
-        $resources_path = $app_path . '/Http/Resources';
+        $this->createFile(
+            $stubPath . '/controller.base.stub',
+            $controllerPath . '/Controller.php',
+            ['{{ path }}'],
+            [$absolutePrefix . '\\Resources']
+        );
 
-        if (File::isDirectory($resources_path) === false) {
-            File::makeDirectory($resources_path, 0755, true);
+        $controllerName = $name . 'Controller';
+
+        $this->createFile(
+            $stubPath . '/controller.stub',
+            $controllerPath . '/' . $controllerName . '.php',
+            ['{{class}}', '{{path}}'],
+            [$controllerName, $absolutePrefix . '\\Resources']
+        );
+
+        /**
+         * Resource
+         */
+        $resourcesPath = $appPath . '/Http/Resources' . $absolutePrefix;
+
+        if (File::isDirectory($resourcesPath) === false) {
+            File::makeDirectory($resourcesPath, 0755, true);
         }
 
-        $base_resource_file = $resources_path . '/Resource.php';
+        $this->createFile(
+            $stubPath . '/resource.base.stub',
+            $resourcesPath . '/Resource.php',
+            ['{{path}}'],
+            [$absolutePrefix]
+        );
 
-        if (File::exists($base_resource_file) === false) {
-            File::put($base_resource_file, File::get($stub_path . '/resource.base.stub'));
+        $this->createFile(
+            $stubPath . '/collection.base.stub',
+            $resourcesPath . '/Collection.php',
+            ['{{path}}'],
+            [$absolutePrefix]
+        );
+
+        $resourceName = $name . 'Resource';
+
+        $this->createFile(
+            $stubPath . '/resource.stub',
+            $resourcesPath . '/' . $resourceName . '.php',
+            ['{{class}}', '{{path}}'],
+            [$resourceName, $absolutePrefix]
+        );
+
+        $collectionName = $name . 'Collection';
+
+        $this->createFile(
+            $stubPath . '/collection.stub',
+            $resourcesPath . '/' . $collectionName . '.php',
+            ['{{class}}', '{{path}}'],
+            [$collectionName, $absolutePrefix]
+        );
+
+        /**
+         * Test
+         */
+        $testPath = $this->laravel->basePath('tests/Feature' . $absolutePrefix . '/Resources');
+
+        if (File::isDirectory($testPath) === false) {
+            File::makeDirectory($testPath, 0755, true);
         }
 
-        $base_collection_file = $resources_path . '/Collection.php';
+        $this->createFile(
+            $stubPath . '/test.base.stub',
+            $testPath . '/TestCase.php',
+            ['{{path}}'],
+            [$absolutePrefix]
+        );
 
-        if (File::exists($base_collection_file) === false) {
-            File::put($base_collection_file, File::get($stub_path . '/collection.base.stub'));
-        }
+        $testName = $controllerName . 'Test';
 
-        $resource_name = $name . 'Resource';
-        $resource_file = $resources_path . '/' . $resource_name . '.php';
-
-        if (File::exists($resource_file) === false) {
-            File::put(
-                $resource_file,
-                str_replace('{{class}}', $resource_name, File::get($stub_path . '/resource.stub'))
-            );
-        }
-
-        $collection_name = $name . 'Collection';
-        $collection_file = $resources_path . '/' . $collection_name . '.php';
-
-        if (File::exists($collection_file) === false) {
-            File::put(
-                $collection_file,
-                str_replace('{{class}}', $collection_name, File::get($stub_path . '/collection.stub'))
-            );
-        }
-
-        // test
-        $test_path = $this->laravel->basePath('tests/Feature/Resources');
-
-        if (File::isDirectory($test_path) === false) {
-            File::makeDirectory($test_path, 0755, true);
-        }
-
-        $base_test_file = $test_path . '/TestCase.php';
-
-        if (File::exists($base_test_file) === false) {
-            File::put($base_test_file, File::get($stub_path . '/test.base.stub'));
-        }
-
-        $test_name = $controller_name . 'Test';
-        $test_file = $test_path . '/' . $test_name . '.php';
-
-        if (File::exists($test_file) === false) {
-            File::put(
-                $test_file,
-                str_replace('{{class}}', $test_name, File::get($stub_path . '/test.stub'))
-            );
-        }
+        $this->createFile(
+            $stubPath . '/test.stub',
+            $testPath . '/' . $testName . '.php',
+            ['{{class}}', '{{path}}'],
+            [$testName, $absolutePrefix]
+        );
 
         // model, migration, seeder
         $this->call('make:model', [
@@ -125,13 +141,22 @@ class MakeCommand extends Command
 
         // request
         $this->call('make:request', [
-            'name' => $name . '/Store',
+            'name' => $nameWithPrefix . '/Store',
         ]);
 
         $this->call('make:request', [
-            'name' => $name . '/Update',
+            'name' => $nameWithPrefix . '/Update',
         ]);
 
         return self::SUCCESS;
+    }
+
+    public function createFile(string $stubFile, string $targetFile, array $placeholder, array $replace): void
+    {
+        if (File::exists($targetFile)) {
+            $this->warn($targetFile . ' already exists!');
+        } else {
+            File::put($targetFile, str_replace($placeholder, $replace, File::get($stubFile)));
+        }
     }
 }

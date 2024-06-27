@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Baijunyao\LaravelRestful\Tests\Home;
+namespace Baijunyao\LaravelRestful\Tests\Resources;
 
 use Baijunyao\LaravelRestful\Tests\TestCase;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +15,7 @@ class TagControllerTest extends TestCase
 {
     public function testIndex(): void
     {
-        $tags = $this->get('/home/tags')
+        $tags = $this->get('/api/tags')
             ->assertStatus(200)
             ->json('data');
 
@@ -27,7 +27,7 @@ class TagControllerTest extends TestCase
     {
         Tag::destroy(self::TAG_ID);
 
-        $this->get('/home/tags/' . self::TAG_ID)->assertStatus(404);
+        $this->get('/api/tags/' . self::TAG_ID)->assertStatus(404);
     }
 
     public function testUpdateDeletedTag(): void
@@ -35,7 +35,7 @@ class TagControllerTest extends TestCase
         Tag::destroy(self::TAG_ID);
 
         $name = self::TAG_NAME . ' updated';
-        $this->put('/home/tags/' . self::TAG_ID, ['name' => $name])->assertStatus(404);
+        $this->put('/api/tags/' . self::TAG_ID, ['name' => $name])->assertStatus(404);
     }
 
     public function testDestroyAndForceDelete(): void
@@ -45,7 +45,7 @@ class TagControllerTest extends TestCase
         DB::table('tags')->where('id', self::TAG_ID)->update(['deleted_at' => now()]);
         static::assertNotNull(DB::table('tags')->where('id', self::TAG_ID)->first());
 
-        $this->delete('/home/tags/' . self::TAG_ID . '/forceDelete')->assertStatus(204);
+        $this->delete('/api/tags/' . self::TAG_ID . '/forceDelete')->assertStatus(204);
 
         static::assertNull(DB::table('tags')->where('id', self::TAG_ID)->first());
         Event::assertDispatched(TagDeleted::class);
@@ -58,7 +58,7 @@ class TagControllerTest extends TestCase
         DB::table('tags')->where('id', self::TAG_ID)->update(['deleted_at' => now()]);
         static::assertNotNull(DB::table('tags')->where('id', self::TAG_ID)->first());
 
-        $this->patch('/home/tags/' . self::TAG_ID . '/restore')->assertStatus(200);
+        $this->patch('/api/tags/' . self::TAG_ID . '/restore')->assertStatus(200);
 
         Event::assertDispatched(TagRestored::class);
     }

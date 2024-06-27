@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Workbench\App\Http\Controllers\Admin;
+namespace Workbench\App\Http\Controllers\Admin\Resources;
 
 use Baijunyao\LaravelRestful\RestfulController;
 use Baijunyao\LaravelRestful\Traits\Show;

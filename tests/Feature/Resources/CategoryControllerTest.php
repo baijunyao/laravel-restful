@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Baijunyao\LaravelRestful\Tests\Home;
+namespace Baijunyao\LaravelRestful\Tests\Resources;
 
 use Baijunyao\LaravelRestful\Tests\TestCase;
 use Illuminate\Support\Facades\Event;
@@ -14,7 +14,7 @@ class CategoryControllerTest extends TestCase
 {
     public function testIndex(): void
     {
-        $categories = $this->get('/home/categories')
+        $categories = $this->getJson('/api/categories')
             ->assertStatus(200)
             ->json('data');
 
@@ -30,7 +30,7 @@ class CategoryControllerTest extends TestCase
             'include'            => 'tag',
         ];
 
-        $categories = $this->get('/home/categories?' . http_build_query($query))
+        $categories = $this->getJson('/api/categories?' . http_build_query($query))
             ->assertStatus(200)
             ->json('data');
 
@@ -46,7 +46,7 @@ class CategoryControllerTest extends TestCase
 
     public function testIndexSort(): void
     {
-        $categories = $this->get('/home/categories?sort=-id')
+        $categories = $this->getJson('/api/categories?sort=-id')
             ->assertStatus(200)
             ->json('data');
 
@@ -56,7 +56,7 @@ class CategoryControllerTest extends TestCase
 
     public function testShow(): void
     {
-        $category = $this->get('/home/categories/' . self::CATEGORY_ID . '?include=tag')
+        $category = $this->getJson('/api/categories/' . self::CATEGORY_ID . '?include=tag')
             ->assertStatus(200)
             ->json('data');
 
@@ -70,8 +70,8 @@ class CategoryControllerTest extends TestCase
         Event::fake();
 
         $name     = 'new category';
-        $category = $this->post(
-            '/home/categories',
+        $category = $this->postJson(
+            '/api/categories',
             [
                 'name'        => $name,
                 'tag_id'      => null,
@@ -87,8 +87,8 @@ class CategoryControllerTest extends TestCase
 
     public function testStoreError(): void
     {
-        $response = $this->post(
-            '/home/categories',
+        $response = $this->postJson(
+            '/api/categories',
             [
                 'description' => 'new category description',
             ],
@@ -108,7 +108,7 @@ class CategoryControllerTest extends TestCase
         Event::fake();
 
         $name     = self::CATEGORY_NAME . ' updated';
-        $category = $this->put('/home/categories/' . self::CATEGORY_ID, ['name' => $name])
+        $category = $this->putJson('/api/categories/' . self::CATEGORY_ID, ['name' => $name])
             ->assertStatus(200)
             ->json('data');
 
@@ -120,19 +120,19 @@ class CategoryControllerTest extends TestCase
     {
         Event::fake();
 
-        $this->delete('/home/categories/' . self::CATEGORY_ID)->assertStatus(204);
+        $this->deleteJson('/api/categories/' . self::CATEGORY_ID)->assertStatus(204);
 
         Event::assertDispatched(CategoryDeleted::class);
     }
 
     public function testDestroyWhenIdNotFound(): void
     {
-        $this->delete('/home/categories/' . self::ID_NOT_FOUND)->assertStatus(404);
+        $this->deleteJson('/api/categories/' . self::ID_NOT_FOUND)->assertStatus(404);
     }
 
     public function testForceDeleteError(): void
     {
-        $response = $this->delete('/home/categories/' . self::CATEGORY_ID . '/forceDelete')->assertStatus(500);
+        $response = $this->deleteJson('/api/categories/' . self::CATEGORY_ID . '/forceDelete')->assertStatus(500);
         static::assertEquals(
             'You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the Workbench\App\Models\Category model.',
             $response->exception->getMessage()
@@ -141,7 +141,7 @@ class CategoryControllerTest extends TestCase
 
     public function testRestoreError(): void
     {
-        $response = $this->patch('/home/categories/' . self::CATEGORY_ID . '/restore')->assertStatus(500);
+        $response = $this->patchJson('/api/categories/' . self::CATEGORY_ID . '/restore')->assertStatus(500);
         static::assertEquals(
             'You should add the Illuminate\Database\Eloquent\SoftDeletes trait to the Workbench\App\Models\Category model.',
             $response->exception->getMessage()

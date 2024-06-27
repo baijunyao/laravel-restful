@@ -11,7 +11,7 @@ class TagControllerTest extends TestCase
 {
     public function testIndex(): void
     {
-        $tags = $this->get('/admin/tags?include=categoriesCount')
+        $tags = $this->getJson('/api/admin/tags?include=categoriesCount')
             ->assertStatus(200)
             ->json('data');
 
@@ -22,7 +22,7 @@ class TagControllerTest extends TestCase
     {
         Tag::destroy(self::TAG_ID);
 
-        $tag = $this->get('/admin/tags/' . self::TAG_ID)
+        $tag = $this->getJson('/api/admin/tags/' . self::TAG_ID)
             ->assertStatus(200)
             ->json('data');
 
@@ -34,7 +34,7 @@ class TagControllerTest extends TestCase
         Tag::destroy(self::TAG_ID);
 
         $name = self::TAG_NAME . ' updated';
-        $tag  = $this->put('/admin/tags/' . self::TAG_ID, ['name' => $name])
+        $tag  = $this->putJson('/api/admin/tags/' . self::TAG_ID, ['name' => $name])
             ->assertStatus(200)
             ->json('data');
 

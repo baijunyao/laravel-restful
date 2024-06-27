@@ -101,6 +101,16 @@ abstract class RestfulController extends BaseController
         return Str::before(class_basename(static::class), 'Controller');
     }
 
+    /**
+     * @return string e.g. 'Admin' or ''
+     */
+    protected function getPrefix(): string
+    {
+        $prefixPath = Str::after(static::class, 'Http\\Controllers');
+
+        return Str::trim(Str::before($prefixPath, 'Resources'), '\\');
+    }
+
     protected function getAppNamespace(): string
     {
         return Str::before(static::class, 'Http\\');
@@ -119,7 +129,9 @@ abstract class RestfulController extends BaseController
      */
     protected function getResourceFqcn(): string
     {
-        return $this->getAppNamespace() . 'Http\\Resources\\' . $this->getResourceName() . 'Resource';
+        $prefix = $this->getPrefix() === '' ? '' : ($this->getPrefix() . '\\');
+
+        return $this->getAppNamespace() . 'Http\\Resources\\' . $prefix . $this->getResourceName() . 'Resource';
     }
 
     /**
@@ -127,7 +139,9 @@ abstract class RestfulController extends BaseController
      */
     protected function getResourceCollectionFqcn(): string
     {
-        return $this->getAppNamespace() . 'Http\\Resources\\' . $this->getResourceName() . 'Collection';
+        $prefix = $this->getPrefix() === '' ? '' : ($this->getPrefix() . '\\');
+
+        return $this->getAppNamespace() . 'Http\\Resources\\' . $prefix . $this->getResourceName() . 'Collection';
     }
 
     protected function getFilteredPayload(): array
@@ -143,7 +157,8 @@ abstract class RestfulController extends BaseController
 
     protected function formRequestValidation(string $className): void
     {
-        $requestClass = $this->getAppNamespace() . 'Http\\Requests\\' . $this->getResourceName() . '\\' . $className;
+        $prefix       = $this->getPrefix() === '' ? '' : ($this->getPrefix() . '\\');
+        $requestClass = $this->getAppNamespace() . 'Http\\Requests\\' . $prefix . $this->getResourceName() . '\\' . $className;
 
         if (class_exists($requestClass)) {
             $app     = App::getInstance();
