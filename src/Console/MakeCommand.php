@@ -18,15 +18,19 @@ class MakeCommand extends Command
         // e.g. 'User' or 'Admin/User'
         $nameWithPrefix = $this->argument('name');
 
-        $prefix         = '';
-        $absolutePrefix = '';
+        $prefix          = '';
+        $namespacePrefix = '';
+        $pathPrefix      = '';
 
         if (Str::contains($nameWithPrefix, '/')) {
             // e.g. Admin or ''
             $prefix  = Str::beforeLast($nameWithPrefix, '/');
 
-            // e.g. /Admin or ''
-            $absolutePrefix = '/' . $prefix;
+            // e.g. \Admin or ''
+            $namespacePrefix = '\\' . $prefix;
+
+            // e.g. /admin or ''
+            $pathPrefix = '/' . $prefix;
         }
 
         $appPath = $this->laravel->path();
@@ -54,7 +58,7 @@ class MakeCommand extends Command
             $stubPath . '/controller.base.stub',
             $controllerPath . '/Controller.php',
             ['{{ path }}'],
-            [$absolutePrefix . '\\Resources']
+            [$namespacePrefix . '\\Resources']
         );
 
         $controllerName = $name . 'Controller';
@@ -63,13 +67,13 @@ class MakeCommand extends Command
             $stubPath . '/controller.stub',
             $controllerPath . '/' . $controllerName . '.php',
             ['{{class}}', '{{path}}'],
-            [$controllerName, $absolutePrefix . '\\Resources']
+            [$controllerName, $namespacePrefix . '\\Resources']
         );
 
         /**
          * Resource
          */
-        $resourcesPath = $appPath . '/Http/Resources' . $absolutePrefix;
+        $resourcesPath = $appPath . '/Http/Resources' . $pathPrefix;
 
         if (File::isDirectory($resourcesPath) === false) {
             File::makeDirectory($resourcesPath, 0755, true);
@@ -79,14 +83,14 @@ class MakeCommand extends Command
             $stubPath . '/resource.base.stub',
             $resourcesPath . '/Resource.php',
             ['{{path}}'],
-            [$absolutePrefix]
+            [$namespacePrefix]
         );
 
         $this->createFile(
             $stubPath . '/collection.base.stub',
             $resourcesPath . '/Collection.php',
             ['{{path}}'],
-            [$absolutePrefix]
+            [$namespacePrefix]
         );
 
         $resourceName = $name . 'Resource';
@@ -95,7 +99,7 @@ class MakeCommand extends Command
             $stubPath . '/resource.stub',
             $resourcesPath . '/' . $resourceName . '.php',
             ['{{class}}', '{{path}}'],
-            [$resourceName, $absolutePrefix]
+            [$resourceName, $namespacePrefix]
         );
 
         $collectionName = $name . 'Collection';
@@ -104,13 +108,13 @@ class MakeCommand extends Command
             $stubPath . '/collection.stub',
             $resourcesPath . '/' . $collectionName . '.php',
             ['{{class}}', '{{path}}'],
-            [$collectionName, $absolutePrefix]
+            [$collectionName, $namespacePrefix]
         );
 
         /**
          * Test
          */
-        $testPath = $this->laravel->basePath('tests/Feature' . $absolutePrefix . '/Resources');
+        $testPath = $this->laravel->basePath('tests/Feature' . $pathPrefix . '/Resources');
 
         if (File::isDirectory($testPath) === false) {
             File::makeDirectory($testPath, 0755, true);
@@ -120,7 +124,7 @@ class MakeCommand extends Command
             $stubPath . '/test.base.stub',
             $testPath . '/TestCase.php',
             ['{{path}}'],
-            [$absolutePrefix]
+            [$namespacePrefix]
         );
 
         $testName = $controllerName . 'Test';
@@ -129,7 +133,7 @@ class MakeCommand extends Command
             $stubPath . '/test.stub',
             $testPath . '/' . $testName . '.php',
             ['{{class}}', '{{path}}'],
-            [$testName, $absolutePrefix]
+            [$testName, $namespacePrefix]
         );
 
         // model, migration, seeder
